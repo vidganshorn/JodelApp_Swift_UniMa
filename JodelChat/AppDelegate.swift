@@ -8,14 +8,41 @@
 
 import UIKit
 
+import Parse
+import Bolts
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
+    var userManager: ConnectedUserManager!
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        /*
+        let configuration = ParseClientConfiguration {
+            $0.applicationId = "sDD1ikaiVKI8oKpU8nlE8FokztUzg7xYdrw9Y3jM"
+            $0.server = "http://YOUR_PARSE_SERVER:1337/parse"
+        }
+        Parse.initializeWithConfiguration(configuration)
+        */
+        // [Optional] Power your app with Local Datastore. For more info, go to
+        // https://parse.com/docs/ios_guide#localdatastore/iOS
+        Parse.enableLocalDatastore()
+        
+        // Initialize Parse.
+        // Our Parse.com credentials
+        // ApplicationId    - sDD1ikaiVKI8oKpU8nlE8FokztUzg7xYdrw9Y3jM
+        // ClientKey        - O4G2zD7qp2mF7kIp7hRI7Mc2JLVnZFc7o64GPMNe
+        Parse.setApplicationId("sDD1ikaiVKI8oKpU8nlE8FokztUzg7xYdrw9Y3jM",
+            clientKey: "O4G2zD7qp2mF7kIp7hRI7Mc2JLVnZFc7o64GPMNe")
+        
+        // [Optional] Track statistics around application opens.
+        PFAnalytics.trackAppOpenedWithLaunchOptions(launchOptions)
+        
+        userManager = ConnectedUserManager()
+        
         return true
     }
 
@@ -27,6 +54,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        
+        SocketIOManager.sharedInstance.closeConnection()
     }
 
     func applicationWillEnterForeground(application: UIApplication) {
@@ -35,6 +64,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        
+        SocketIOManager.sharedInstance.establishConnection()
     }
 
     func applicationWillTerminate(application: UIApplication) {
